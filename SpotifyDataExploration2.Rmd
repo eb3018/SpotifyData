@@ -1,0 +1,126 @@
+---
+  title: "R Notebook"
+output:
+  html_document:
+  df_print: paged
+---
+  
+  
+  ```{r}
+dat.merge <- read.csv("PopularMusicByAge.csv")
+
+#creating a new column that is titled "Age Popular" on the data sheet becuase then we know the age of the participant WHEN the song was popular. 
+dat.merge$AgePopular <- dat.merge$YearPopular-(2016-as.numeric(dat.merge$age_bucket))
+
+#This is taking the age_bucket of the participant and seeing if it is less than 80 years, or if it is more than 25 years, and including only those rows. 
+dat.merge <- dat.merge[(dat.merge$age_bucket<=80),]
+dat.merge <- dat.merge[(dat.merge$age_bucket>=25),]
+View(dat.merge)
+
+summary(dat.merge)
+newdata = dat.merge[,c(4,6,8)]
+summary(newdata) #This gives the minimum/maximum/means for age bucket, ranking, and age popular.
+
+#this gives a 3x3 sheet that looks at correlation between all the 3 variables. 
+#plot(newdata, pch=3, col='blue', main= "Tryin' it out")
+
+#Below gives that hella long list of songs and numbers after them.
+#reg1 <-  lm(ranking~as.factor(track_name)+as.factor(age_bucket),data=dat.merge)
+#summary(reg1) 
+
+names(dat.merge) #gives the titles of the columns.
+
+dat.merge.sub <- subset(dat.merge, ranking >=4001)
+View(dat.merge.sub) #This gives a dataframe of all of the values that didn't have spotify data.
+
+#Below gives hella long list of songs and numbers after them for datmerge for the songs in gender/age that don't have any info on Spotify.
+#reg3 <- lm(ranking~as.factor(track_name)+as.factor(age_bucket),data=dat.merge.sub)
+#summary(reg3) 
+
+```
+
+New trials with selected data with only 4 songs. 
+```{r}
+dat.merge2 <- read.csv("spotifySelectedData.csv")
+dat.merge2$AgePopular <- dat.merge2$YearPopular-(2016-as.numeric(dat.merge2$age_bucket))
+
+dat.merge2 <- dat.merge2[(dat.merge2$age_bucket<=80),]
+dat.merge2 <- dat.merge2[(dat.merge2$age_bucket>=25),]
+View(dat.merge2)
+
+reg2 <- lm(ranking~as.factor(track_name)+as.factor(age_bucket),data=dat.merge2)
+summary(reg2) #List of those four songs. 
+
+newdata2 = dat.merge2[,c(4,6,8)]
+summary(newdata2)
+#Below is the weird 3x3 graphs of correlations between all 3 variables.
+#pl2 <- plot(newdata2)  
+
+```
+
+
+```{r}
+#Load ggplot!!
+library(ggplot2)
+#Load csv file I created ONLY with information from Janet Jackson's "That's The Way Love Goes"
+dat.Janet <- read.csv("ThatsTheWayLoveGoes.csv")
+View(dat.Janet)
+#Create a new data that only has the Age Bucket, Ranking, and Gender in it. 
+newdataJanet <- dat.Janet[,c(4,5,6)]
+summary(newdataJanet)
+
+gplotJanet <- ggplot(data=newdataJanet, aes(x=age_bucket, y=ranking)) +
+  geom_point(aes(color=gender))+
+  labs(title='Popularity by Age for Janet Jackson "That\'s the Way Love Goes"', x='Age Bucket (current, i.e., not adjusted to year)', y='Ranking (out of 4001)')
+
+gplotJanet
+gplotJanet + scale_y_reverse() #Reverses Y axis so higher the ranking the lower it is on the graph.
+
+#Does a 3x3 weird graphing of correlations of the 3 variables. 
+plot(newdataJanet)
+
+```
+
+
+```{r}
+library(ggplot2)
+dat.Savage <- read.csv("Truly Madly Deeply.csv")
+View(dat.Savage)
+newdataSavage <- dat.Savage[,c(4,5,6)]
+
+summary(newdataSavage)
+summary(newdataSavage$age_bucket)
+
+gplotSavage <- ggplot(data=newdataSavage, aes(x=age_bucket, y=ranking, group=1)) +
+  geom_point(aes(color=gender))+
+  labs(title='Popularity by Age for Savage Garden "Truly Madly Deeply"', x='Age Bucket (current, i.e., not adjusted to year)', y='Ranking (out of 4001)')
+gplotSavage
+gplotSavage + scale_y_reverse() #Reverses Y axis so higher the ranking the lower it is on the graph.
+```
+
+The above two graphs look similar to the graphs under the Avg. Spotify Rank by Age in the NYT article. 
+
+However, if you take another song that might not have that much of a correlation, like "96 Tears"...
+
+```{r}
+library(ggplot2)
+dat.Tears <- read.csv("ninetySixTears.csv")
+View(dat.Tears)
+newdataTears <- dat.Tears[,c(4,5,6)]
+
+summary(newdataTears)
+summary(newdataTears$age_bucket)
+
+gplotTears <- ggplot(data=newdataTears, aes(x=age_bucket, y=ranking, group=1)) +
+  geom_point(aes(color=gender))+
+  labs(title='Popularity by Age for ? and the Mysterians "96 Tears"', x='Age Bucket (current, i.e., not adjusted to year)', y='Ranking (out of 4001)')
+gplotTears
+gplotTears + scale_y_reverse() #Reverses Y axis so higher the ranking the lower it is on the graph.
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
